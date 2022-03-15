@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const UserModel = require("../models/user.model");
 
-exports.checkUser = (req, res, next) => {
+exports.checkUser = (req, res, next,stop) => {
   const token = req.cookies.jwt;
   if (token) {
     jwt.verify(token, process.env.TOKEN_SECRET, async (err, data) => {
@@ -16,7 +16,7 @@ exports.checkUser = (req, res, next) => {
     });
   } else {
     res.locals.user = null;
-    next();
+    stop();
   }
 };
 
@@ -32,6 +32,6 @@ exports.requireAuth = (req, res, next) => {
       }
     });
   } else {
-      console.log('No token');
+    console.log("No token");
   }
 };
