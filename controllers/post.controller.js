@@ -150,7 +150,7 @@ exports.editCommentPost = (req, res) => {
   try {
     return PostModel.findById(req.params.id, (err, data) => {
       const theComment = data.comments.find((comment) => {
-        return comment._id == req.body.commentId
+        return comment._id == req.body.commentId;
       });
       if (!theComment) return res.status(404).send("Comment not found");
       theComment.text = req.body.text;
@@ -165,7 +165,27 @@ exports.editCommentPost = (req, res) => {
   }
 };
 
-exports.deleteCommentPost = async (req, res) => {
+exports.deleteCommentPost = (req, res) => {
   if (!ObjectId.isValid(req.params.id))
     return res.status(400).send("ID unknow : " + req.params.id);
+
+  try {
+    return PostModel.findOneAndUpdate(
+      req.params.id,
+      {
+        $pull: {
+          comments: {
+            _id: req.body.commentId,
+          },
+        },
+      },
+      { new: true },
+      (e, data) => {
+        if (!e) return res.send(data);
+        else return res.status(400).json(e);
+      }
+    );
+  } catch (e) {
+      return res.status(500).json(e);
+  }
 };
