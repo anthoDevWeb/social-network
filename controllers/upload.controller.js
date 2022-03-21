@@ -1,8 +1,8 @@
 const UserModel = require("../models/user.model");
 const fs = require("fs");
 const { promisify } = require("util");
-const { uploadErrors } = require("../utils/errors.utils");
 const pipeline = promisify(require("stream").pipeline);
+const { uploadErrors } = require("../utils/errors.utils");
 
 exports.uploadProfil = async (req, res) => {
   try {
@@ -26,4 +26,17 @@ exports.uploadProfil = async (req, res) => {
       `${__dirname}/../client/public/uploads/profil/${fileName}`
     )
   );
-};
+  try {
+    await UserModel.findByIdAndUpdate(
+      req.body.userId,
+      { $set: { picture: "./uploads/profil/" + fileName } },
+      { new: true, upsert: true, setDefaultsOnInsert: true },
+      (e, data) => {
+        if (!e) return res.send(data);
+        else return res.status(500).send({ message: e });
+      }
+    );
+  } catch (e) {
+    return new Error(e)
+  }
+}; 
