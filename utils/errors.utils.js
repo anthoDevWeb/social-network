@@ -20,3 +20,14 @@ exports.signInErrors = (err) => {
     errors.password = "Le mot de passe ne correspond pas";
   return errors;
 };
+
+exports.uploadErrors = (e) => {
+  let errors = { format: "", maxSize: "" };
+
+  if (e.message.includes("invalid file"))
+    errors.format = "Format incompatible";
+  if (e.message.includes("max size"))
+    errors.maxSize = "Le fichier dépasse 2.5Mo";
+
+  return errors;
+};

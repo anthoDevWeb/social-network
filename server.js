@@ -19,7 +19,7 @@ app.get("/jwtid", requireAuth, (req, res) => {
 
 //routes
 app.use("/api/user", userRoutes);
-app.use("/api/post", postRoutes)
+app.use("/api/post", postRoutes);
 
 // server
 app.listen(process.env.PORT, () => {
