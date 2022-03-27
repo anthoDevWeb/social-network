@@ -21,13 +21,14 @@ exports.signInErrors = (err) => {
   return errors;
 };
 
-exports.uploadErrors = (e) => {
-  let errors = { format: "", maxSize: "" };
+module.exports.uploadErrors = (err) => {
+  let errors = { format: '', maxSize: ""};
 
-  if (e.message.includes("invalid file"))
+  if (err.message.includes('invalid file'))
     errors.format = "Format incompatible";
-  if (e.message.includes("max size"))
-    errors.maxSize = "Le fichier dépasse 2.5Mo";
 
-  return errors;
-};
+  if (err.message.includes('max size'))
+    errors.maxSize = "Le fichier dépasse 2.5mo";
+
+  return errors
+}

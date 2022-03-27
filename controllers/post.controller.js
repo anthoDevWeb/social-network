@@ -13,24 +13,25 @@ exports.readPost = (req, res) => {
   }).sort({ createdAt: -1 });
 };
 
-exports.createPost = async (req, res) => {
+module.exports.createPost = async (req, res) => {
   let fileName;
 
   if (req.file !== null) {
     try {
       if (
-        req.file.detectedMimeType !== "image/jpg" &&
-        req.file.detectedMimeType !== "image/png" &&
-        req.file.detectedMimeType !== "image/jpeg"
+        req.file.detectedMimeType != "image/jpg" &&
+        req.file.detectedMimeType != "image/png" &&
+        req.file.detectedMimeType != "image/jpeg"
       )
         throw Error("invalid file");
-      if (req.file.size > 2500000) throw Error("max size");
-    } catch (e) {
-      const errors = uploadErrors(e);
-      return res.status(500).json({ errors });
-    }
 
+      if (req.file.size > 500000) throw Error("max size");
+    } catch (err) {
+      const errors = uploadErrors(err);
+      return res.status(201).json({ errors });
+    }
     fileName = req.body.posterId + Date.now() + ".jpg";
+
     await pipeline(
       req.file.stream,
       fs.createWriteStream(
@@ -38,6 +39,7 @@ exports.createPost = async (req, res) => {
       )
     );
   }
+
   const newPost = new PostModel({
     posterId: req.body.posterId,
     message: req.body.message,
@@ -50,9 +52,28 @@ exports.createPost = async (req, res) => {
   try {
     const post = await newPost.save();
     return res.status(201).json(post);
-  } catch (error) {
+  } catch (err) {
     return res.status(400).send(err);
   }
+};
+
+module.exports.updatePost = (req, res) => {
+  if (!ObjectID.isValid(req.params.id))
+    return res.status(400).send("ID unknown : " + req.params.id);
+
+  const updatedRecord = {
+    message: req.body.message,
+  };
+
+  PostModel.findByIdAndUpdate(
+    req.params.id,
+    { $set: updatedRecord },
+    { new: true },
+    (err, docs) => {
+      if (!err) res.send(docs);
+      else console.log("Update error : " + err);
+    }
+  );
 };
 
 exports.updatePost = async (req, res) => {
