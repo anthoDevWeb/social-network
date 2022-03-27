@@ -41,7 +41,7 @@ exports.createPost = async (req, res) => {
   const newPost = new PostModel({
     posterId: req.body.posterId,
     message: req.body.message,
-    picture: req.file !== null ? "./upload/posts/" + fileName : "",
+    picture: req.file !== null ? "./uploads/posts/" + fileName : "",
     video: req.body.video,
     likers: [],
     comments: [],
@@ -194,12 +194,12 @@ exports.editCommentPost = (req, res) => {
   }
 };
 
-exports.deleteCommentPost = (req, res) => {
+module.exports.deleteCommentPost = (req, res) => {
   if (!ObjectId.isValid(req.params.id))
-    return res.status(400).send("ID unknow : " + req.params.id);
+    return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
-    return PostModel.findOneAndUpdate(
+    return PostModel.findByIdAndUpdate(
       req.params.id,
       {
         $pull: {
@@ -208,13 +208,11 @@ exports.deleteCommentPost = (req, res) => {
           },
         },
       },
-      { new: true },
-      (e, data) => {
-        if (!e) return res.send(data);
-        else return res.status(400).json(e);
-      }
-    );
-  } catch (e) {
-    return res.status(500).json(e);
+      { new: true }
+    )
+      .then((data) => res.send(data))
+      .catch((err) => res.status(500).send({ message: err }));
+  } catch (err) {
+    return res.status(400).send(err);
   }
 };
