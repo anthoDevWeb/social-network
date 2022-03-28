@@ -1,11 +1,13 @@
 const express = require("express");
-const path = require("path")
+const path = require("path");
 const userRoutes = require("./routes/user.routes");
 const postRoutes = require("./routes/post.routes");
 const cookieParser = require("cookie-parser");
 require("dotenv").config({ path: "./.env" });
 require("./config/db");
 const { checkUser, requireAuth } = require("./middleware/auth.middleware");
+
+const port = process.env.PORT || 5000;
 
 const app = express();
 
@@ -44,11 +46,11 @@ app.use("/api/post", postRoutes);
 
 app.use(express.static(path.join(__dirname, "/client/build")));
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '/client/build/public/', 'index.html'));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "/client/build/public/", "index.html"));
 });
 
 // server
-app.listen(process.env.PORT, () => {
-  console.log(`Listening on port ${process.env.PORT}`);
+app.listen(port, () => {
+  console.log(`Listening on port ${port}`);
 });
